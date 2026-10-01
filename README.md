@@ -11,7 +11,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
 ![No build step](https://img.shields.io/badge/build-none%20needed-ff3fa4)
 ![100% procedural](https://img.shields.io/badge/assets-100%25%20procedural-35f2ff)
-![MIT License](https://img.shields.io/badge/license-MIT-f5d300)
+![License](https://img.shields.io/badge/license-Source--Available-f5d300)
 
 <p>
   <a href="#-screenshots"><b>Screenshots</b></a> &nbsp;·&nbsp;
@@ -257,7 +257,7 @@ Still to do:
 
 ## 📄 License
 
-Released under the [MIT License](LICENSE). You are free to use, modify and share it, as long as the copyright notice stays.
+This project is source-available under the [Yash AIL Source-Available License](LICENSE.md): you may view, copy and modify it for personal, educational and non-commercial local use. **Deploying/hosting it online and selling it are not allowed.** Built for educational and portfolio purposes.
 
 <div align="center">
 <sub>Built by <a href="https://github.com/yash262626">Yash Dhanraj Ail</a> · <a href="https://yashail.netlify.app">Portfolio</a></sub>
