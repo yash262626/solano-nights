@@ -11,12 +11,34 @@
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
 ![No build step](https://img.shields.io/badge/build-none%20needed-ff3fa4)
 ![100% procedural](https://img.shields.io/badge/assets-100%25%20procedural-35f2ff)
+![MIT License](https://img.shields.io/badge/license-MIT-f5d300)
+
+<p>
+  <a href="#-screenshots"><b>Screenshots</b></a> &nbsp;·&nbsp;
+  <a href="#-quick-start"><b>Quick start</b></a> &nbsp;·&nbsp;
+  <a href="#-controls"><b>Controls</b></a> &nbsp;·&nbsp;
+  <a href="#-features"><b>Features</b></a> &nbsp;·&nbsp;
+  <a href="#%EF%B8%8F-under-the-hood"><b>Under the hood</b></a> &nbsp;·&nbsp;
+  <a href="#%EF%B8%8F-roadmap"><b>Roadmap</b></a>
+</p>
 
 <img src="screenshots/1_sunset_drive.jpg" alt="Driving down Ocean Drive at sunset, with the neon Ferris wheel on the pier" width="90%">
 
 </div>
 
 ---
+
+## ⚡ At a glance
+
+| | |
+|---|---|
+| 🎬 **Story** | Six original missions with two characters, Rosa and Dex |
+| 🚗 **Driving** | Damage, skids, deep water and AI traffic that reacts to you |
+| 🔫 **Combat** | Five weapon types, aim-down-sights, grenades and chain explosions |
+| 🚨 **Police** | 1 to 5 star wanted level, pursuit cars and a helicopter at 4+ |
+| 🌆 **World** | Day/night cycle, weather, rain and a full city generated at startup |
+| 📦 **Assets** | None downloaded: everything is generated in code |
+| 🛠️ **Setup** | Node.js 18+, no build step |
 
 Solano Nights is a third-person open-world action game: drive, shoot, run from the cops and work
 through a six-mission crime story in a fictional 1980s coastal city.
@@ -223,6 +245,12 @@ Still to do:
 
 ---
 
+## 📄 License
+
+Released under the [MIT License](LICENSE). You are free to use, modify and share it, as long as the copyright notice stays.
+
 <div align="center">
+<sub>Built by <a href="https://github.com/yash262626">Yash Dhanraj Ail</a> · <a href="https://yashail.netlify.app">Portfolio</a></sub>
+<br>
 <sub>Original game. All names, characters, places and assets are fictional and procedurally generated.</sub>
 </div>
