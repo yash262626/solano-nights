@@ -4,6 +4,12 @@ const fs = require('fs');
 const path = require('path');
 
 const root = __dirname;
+
+// Friendly start-up check: the game loads Three.js from node_modules via an import map.
+if (!fs.existsSync(path.join(root, 'node_modules', 'three', 'build', 'three.module.js'))) {
+  console.error('\nThree.js is not installed yet. Run "npm install" once in this folder, then start the server again.\n');
+  process.exit(1);
+}
 const port = Number(process.argv.find((a) => /^\d+$/.test(a)) || process.env.PORT || 8080);
 // Dev-only features (the /__shot capture endpoint used by the test kit) require an explicit flag.
 const DEV = process.argv.includes('--dev') || process.env.SOLANO_DEV === '1';
@@ -34,4 +40,8 @@ http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(data);
   });
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') console.error(`\nPort ${port} is already in use. Close the other program or pick another port, e.g. "node server.js 3000".\n`);
+  else console.error(err);
+  process.exit(1);
 }).listen(port, HOST, () => console.log(`Solano Nights running at http://localhost:${port}${DEV ? ' (dev mode)' : ''}`));
