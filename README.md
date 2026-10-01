@@ -67,7 +67,7 @@ npm install
 npm start
 ```
 
-Open **http://localhost:8080** and click **New Game**. Walk into the pink marker outside Club
+Open the address shown in the terminal (port 8080 by default) in your browser and click **New Game**. Walk into the pink marker outside Club
 Nocturne to meet Rosa and start the story.
 
 > The only dependency is Three.js, loaded straight from `node_modules` through an import map, so
@@ -78,9 +78,8 @@ Nocturne to meet Rosa and start the story.
 | Problem | Fix |
 |---|---|
 | Blank page or "Three.js is not installed yet" | Run `npm install` once in the project folder, then `npm start`. |
-| `Port 8080 is already in use` | Start on another port: `node server.js 3000`, then open http://localhost:3000. |
+| `Port 8080 is already in use` | Start on another port: `node server.js 3000` and open that port instead. |
 | Page does not load when opening `index.html` directly | Always use the server. Browsers block ES modules from `file://`. |
-| `localhost` does not open | The server listens on IPv4 only, so try http://127.0.0.1:8080. |
 | `npm` is blocked in PowerShell | Run the commands in Command Prompt (`cmd`) instead. |
 
 ## 🎮 Controls
@@ -178,7 +177,7 @@ Progress auto-saves. Pick **Continue** on the title screen to resume.
 
 ```
 index.html        HUD, menus, styling and the import map
-server.js         zero-dependency static server (localhost only)
+server.js         zero-dependency static server
 src/main.js       boot, title and pause menus
 src/game.js       renderer, post-processing, main loop, event handlers, save/load
 src/events.js     event bus + game-time scheduler
@@ -206,7 +205,7 @@ src/tests.js      regression suite + benchmark (?test)
 <details>
 <summary><b>Automated tests and benchmark</b></summary>
 
-Open `http://localhost:8080/?autostart&test` and use the browser console:
+Start the server, open the game with `?autostart&test` added to the address, and use the browser console:
 
 | Command | Purpose |
 |---|---|
@@ -233,7 +232,6 @@ Done:
 - Event bus.
 - Central AI tuning table.
 - Skid marks.
-- A dev server that only listens on localhost.
 
 Still to do:
 - Character-to-character collision
