@@ -73,6 +73,16 @@ Nocturne to meet Rosa and start the story.
 > The only dependency is Three.js, loaded straight from `node_modules` through an import map, so
 > there is no bundler and no build step.
 
+### 🛠️ Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| Blank page or "Three.js is not installed yet" | Run `npm install` once in the project folder, then `npm start`. |
+| `Port 8080 is already in use` | Start on another port: `node server.js 3000`, then open http://localhost:3000. |
+| Page does not load when opening `index.html` directly | Always use the server. Browsers block ES modules from `file://`. |
+| `localhost` does not open | The server listens on IPv4 only, so try http://127.0.0.1:8080. |
+| `npm` is blocked in PowerShell | Run the commands in Command Prompt (`cmd`) instead. |
+
 ## 🎮 Controls
 
 | Action | Keys |
