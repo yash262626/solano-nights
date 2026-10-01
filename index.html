@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solano Nights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Rajdhani:wght@500;600;700&family=Kaushan+Script&display=swap" rel="stylesheet">
+<style>
+  :root { --pink:#ff3fa4; --cyan:#35f2ff; --yellow:#ffd23f; --ui: 'Rajdhani', 'Segoe UI', Arial, sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #05040a; color: #fff; font-family: var(--ui); user-select: none; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .overlay { position: fixed; inset: 0; display: none; }
+  .overlay.show { display: flex; }
+
+  /* ---------------- loading & title */
+  #loading { background: radial-gradient(ellipse at 50% 120%, #ff3fa433, transparent 60%), linear-gradient(#0a0618, #05040a); align-items: center; justify-content: center; flex-direction: column; gap: 22px; z-index: 50; }
+  .logo { font-family: 'Monoton', var(--ui); font-size: clamp(42px, 8vw, 110px); color: #fff; letter-spacing: 4px; text-shadow: 0 0 8px var(--pink), 0 0 22px var(--pink), 0 0 48px #ff3fa488; line-height: 1; text-align: center; }
+  .sub { font-family: 'Kaushan Script', cursive; color: var(--cyan); font-size: clamp(20px, 3vw, 36px); text-shadow: 0 0 10px var(--cyan); margin-top: -8px; }
+  #loadBar { width: min(420px, 80vw); height: 6px; background: #ffffff18; border-radius: 3px; overflow: hidden; }
+  #loadFill { height: 100%; width: 0; background: linear-gradient(90deg, var(--pink), var(--cyan)); box-shadow: 0 0 12px var(--pink); transition: width .3s; }
+  #loadText { color: #bbb; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; }
+
+  #title { z-index: 40; align-items: center; justify-content: flex-end; flex-direction: column; padding-bottom: 7vh; background: linear-gradient(180deg, #05040acc 0%, transparent 35%, transparent 55%, #05040aee 100%); }
+  #title .logo { position: absolute; top: 9vh; left: 0; right: 0; }
+  #title .sub { position: absolute; top: calc(9vh + clamp(60px, 10vw, 130px)); left: 0; right: 0; text-align: center; }
+  .menu { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .btn { font-family: var(--ui); font-weight: 700; font-size: 22px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: #0008; border: 2px solid var(--pink); padding: 10px 44px; min-width: 280px; cursor: pointer; box-shadow: 0 0 12px #ff3fa455, inset 0 0 12px #ff3fa433; transition: .15s; }
+  .btn:hover { background: var(--pink); color: #120012; box-shadow: 0 0 24px var(--pink); }
+  .btn.alt { border-color: var(--cyan); box-shadow: 0 0 12px #35f2ff44, inset 0 0 12px #35f2ff22; }
+  .btn.alt:hover { background: var(--cyan); box-shadow: 0 0 24px var(--cyan); }
+  .controls { margin-top: 18px; display: grid; grid-template-columns: repeat(3, auto); gap: 4px 28px; font-size: 15px; color: #ccc; background: #0009; padding: 12px 20px; border: 1px solid #ffffff22; }
+  .controls b { color: var(--yellow); font-weight: 700; }
+  .qrow { color: #aaa; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+  select { font-family: var(--ui); font-size: 15px; background: #111; color: #fff; border: 1px solid #555; padding: 2px 6px; }
+
+  #pause { z-index: 45; background: #05040acc; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+  #pause h1 { font-family: 'Monoton'; font-weight: 400; font-size: 64px; margin: 0 0 10px; text-shadow: 0 0 20px var(--cyan); color: #fff; }
+  #pauseStats { color: #bbb; font-size: 17px; }
+
+  /* ---------------- HUD */
+  #hud { z-index: 10; pointer-events: none; }
+  #hud.show { display: block; }
+  #topRight { position: absolute; top: 18px; right: 24px; text-align: right; }
+  #clock { font-size: 30px; font-weight: 700; letter-spacing: 2px; text-shadow: 2px 2px 0 #000, 0 0 10px #000; }
+  #weaponBox { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 2px; }
+  #weaponIcon { width: 70px; height: 38px; border: 2px solid #ffffffaa; border-radius: 6px; background: #0008; position: relative; }
+  #weaponIcon::after { content: ''; position: absolute; inset: 6px; background: #fff; -webkit-mask: var(--icon) center/contain no-repeat; mask: var(--icon) center/contain no-repeat; }
+  #weaponName { font-size: 18px; font-weight: 700; letter-spacing: 1px; text-shadow: 1px 1px 0 #000; }
+  #ammo { font-size: 18px; color: var(--yellow); text-shadow: 1px 1px 0 #000; min-height: 20px; }
+  #bars { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; margin-top: 8px; }
+  .bar { width: 190px; height: 11px; background: #0009; border: 2px solid #000; position: relative; }
+  .bar > div { height: 100%; transition: width .2s; }
+  #hpFill { background: linear-gradient(90deg, #1fcf5f, #7dff9a); box-shadow: 0 0 8px #4dff88; }
+  #hpFill.low { background: linear-gradient(90deg, #b3001b, #ff4040); animation: pulse .6s infinite alternate; }
+  #arFill { background: linear-gradient(90deg, #1d6fd6, #6cc0ff); }
+  #money { font-size: 36px; font-weight: 700; color: #5fff8a; letter-spacing: 1px; text-shadow: 2px 2px 0 #000, 0 0 12px #1cff6a66; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  #stars { margin-top: 2px; font-size: 30px; letter-spacing: 2px; }
+  .star { color: #ffffff22; -webkit-text-stroke: 1px #000; }
+  .star.on { color: var(--yellow); text-shadow: 0 0 10px var(--yellow); }
+  .star.blink { opacity: 0.25; }
+  #minimapWrap { position: absolute; left: 26px; bottom: 26px; width: 220px; height: 220px; filter: drop-shadow(0 0 8px #000); }
+  #minimap { width: 220px; height: 220px; }
+  #zone { position: absolute; right: 30px; bottom: 30px; font-family: 'Kaushan Script', cursive; font-size: 40px; color: #fff; text-shadow: 0 0 10px var(--pink), 2px 2px 0 #000; opacity: 0; transition: opacity .6s; }
+  #zone.show { opacity: 1; }
+  #objective { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); max-width: 70vw; text-align: center; font-size: 24px; font-weight: 600; text-shadow: 2px 2px 0 #000, 0 0 10px #000; opacity: 0; transition: opacity .4s; }
+  #objective b { color: var(--yellow); }
+  #objective.show { opacity: 1; }
+  #subtitle { position: absolute; left: 50%; bottom: 70px; transform: translateX(-50%); max-width: 70vw; text-align: center; font-size: 22px; font-weight: 600; background: #000a; padding: 6px 16px; border-radius: 3px; opacity: 0; transition: opacity .3s; }
+  #subtitle.show { opacity: 1; }
+  #notify { position: absolute; left: 26px; top: 22px; max-width: 360px; background: #000c; border-left: 4px solid var(--pink); padding: 10px 16px; font-size: 18px; font-weight: 600; opacity: 0; transition: opacity .3s; }
+  #notify.show { opacity: 1; }
+  #hint { position: absolute; left: 50%; top: 62%; transform: translateX(-50%); background: #000b; padding: 6px 14px; font-size: 18px; opacity: 0; transition: opacity .2s; }
+  #hint.show { opacity: 1; }
+  #timer { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 40px; font-weight: 700; color: #fff; text-shadow: 2px 2px 0 #000; display: none; font-variant-numeric: tabular-nums; }
+  #timer.show { display: block; }
+  #timer.urgent { color: #ff4040; animation: pulse .5s infinite alternate; }
+  #speedo { position: absolute; right: 30px; bottom: 90px; text-align: right; opacity: 0; transition: opacity .3s; }
+  #speedo.show { opacity: 1; }
+  #speedVal { font-size: 64px; font-weight: 700; line-height: .9; font-style: italic; color: #fff; text-shadow: 0 0 14px var(--cyan), 3px 3px 0 #000; font-variant-numeric: tabular-nums; }
+  #speedUnit { font-size: 18px; color: var(--cyan); letter-spacing: 3px; }
+  #vehName { font-size: 18px; font-weight: 700; color: #ddd; letter-spacing: 2px; text-transform: uppercase; }
+  #vhpBar { width: 170px; height: 6px; background: #0009; margin: 4px 0 0 auto; border: 1px solid #000; }
+  #vhpFill { height: 100%; background: #ffb13d; }
+  #vhpFill.low { background: #ff3030; }
+  #radio { font-size: 14px; color: var(--pink); letter-spacing: 1px; margin-top: 3px; text-shadow: 0 0 6px var(--pink); }
+  #bigText { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; flex-direction: column; }
+  #bigText.show { display: flex; animation: bigIn .5s ease-out; }
+  #bigMain { font-family: 'Kaushan Script', cursive; font-size: clamp(48px, 8vw, 110px); text-shadow: 4px 4px 0 #000, 0 0 30px #000; }
+  #bigText.pass #bigMain { color: var(--yellow); text-shadow: 4px 4px 0 #000, 0 0 30px #ffd23f88; }
+  #bigText.fail #bigMain { color: #ff3040; text-shadow: 4px 4px 0 #000, 0 0 30px #ff304088; }
+  #bigText.mission #bigMain { color: #fff; font-family: 'Monoton'; font-size: clamp(34px, 5vw, 70px); text-shadow: 0 0 16px var(--pink), 0 0 36px var(--pink); }
+  #bigSub { font-size: 30px; font-weight: 700; text-shadow: 2px 2px 0 #000; margin-top: 6px; }
+  #crosshair { position: absolute; left: 50%; top: 50%; width: 0; height: 0; display: none; --spread: 12px; }
+  #crosshair.show { display: block; }
+  #crosshair i { position: absolute; background: #fff; box-shadow: 0 0 2px #000, 0 0 4px #000; }
+  #crosshair i:nth-child(1) { width: 2px; height: 9px; left: -1px; top: calc(-1 * var(--spread) - 9px); }
+  #crosshair i:nth-child(2) { width: 2px; height: 9px; left: -1px; top: var(--spread); }
+  #crosshair i:nth-child(3) { width: 9px; height: 2px; top: -1px; left: calc(-1 * var(--spread) - 9px); }
+  #crosshair i:nth-child(4) { width: 9px; height: 2px; top: -1px; left: var(--spread); }
+  #crosshair i:nth-child(5) { width: 3px; height: 3px; left: -1.5px; top: -1.5px; border-radius: 50%; }
+  #hitmarker { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; transform: translate(-50%,-50%) rotate(45deg); display: none; }
+  #hitmarker.show { display: block; }
+  #hitmarker::before, #hitmarker::after { content: ''; position: absolute; background: #fff; box-shadow: 0 0 3px #000; }
+  #hitmarker::before { left: 12px; top: 0; width: 2px; height: 26px; -webkit-mask: linear-gradient(#000 35%, transparent 35% 65%, #000 65%); mask: linear-gradient(#000 35%, transparent 35% 65%, #000 65%); }
+  #hitmarker::after { top: 12px; left: 0; height: 2px; width: 26px; -webkit-mask: linear-gradient(90deg, #000 35%, transparent 35% 65%, #000 65%); mask: linear-gradient(90deg, #000 35%, transparent 35% 65%, #000 65%); }
+  #hitmarker.kill::before, #hitmarker.kill::after { background: #ff3040; }
+  #damage { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 45%, #d0001acc 100%); opacity: 0; }
+  #dmgDir { position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; opacity: 0; transform: translate(-50%,-50%); }
+  #dmgDir::before { content: ''; position: absolute; left: 50%; top: 0; width: 60px; height: 26px; transform: translateX(-50%); background: radial-gradient(ellipse at 50% 100%, #ff2020dd, transparent 70%); }
+  #bigmap { position: absolute; inset: 5vh 8vw; background: #000d; border: 2px solid var(--cyan); box-shadow: 0 0 30px #35f2ff44; display: none; }
+  #bigmap.show { display: block; }
+  #bigmapCanvas { width: 100%; height: 100%; }
+  #bigmapLegend { position: absolute; left: 14px; bottom: 10px; font-size: 15px; color: #ccc; }
+  #shop { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 440px; background: #0a0712ee; border: 2px solid #ff7a3c; box-shadow: 0 0 30px #ff7a3c55; padding: 16px 20px; display: none; pointer-events: auto; }
+  #shop.show { display: block; }
+  #shop h2 { margin: 0 0 4px; font-size: 28px; letter-spacing: 3px; color: #ff7a3c; text-shadow: 0 0 10px #ff7a3c; }
+  .shopItem { display: flex; gap: 12px; padding: 6px 8px; font-size: 19px; cursor: pointer; border-bottom: 1px solid #ffffff14; }
+  .shopItem:hover { background: #ff7a3c33; }
+  .shopItem .k { color: var(--yellow); width: 18px; }
+  .shopItem .n { flex: 1; }
+  .shopItem .p { color: #5fff8a; }
+  #fade { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 30; }
+  #fade.flash { opacity: .8; }
+  @keyframes pulse { from { opacity: 1; } to { opacity: .45; } }
+  @keyframes bigIn { from { transform: scale(1.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  #weaponIcon[data-w="fist"] { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M20 8h22a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6H24a8 8 0 0 1-8-8v-8a4 4 0 0 1 4-4zM24 8v8M30 8v8M36 8v8'/%3E%3C/svg%3E"); }
+  #weaponIcon[data-w="pistol"] { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M8 6h48v8H30l-3 14h-9l3-14H8z'/%3E%3C/svg%3E"); }
+  #weaponIcon[data-w="smg"] { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M4 8h56v8H40l-2 4h-6v10h-6V16h-6l-3 8h-7l3-8H4z'/%3E%3C/svg%3E"); }
+  #weaponIcon[data-w="shotgun"] { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M2 12l14-4h46v6H26v4h-8l-4 8H6l2-8z'/%3E%3C/svg%3E"); }
+  #weaponIcon[data-w="rifle"] { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M2 10l12-2h50v6H44v4h-4l2 10h-6l-3-10h-7l-3 6h-7l2-6H2z'/%3E%3C/svg%3E"); }
+  #weaponIcon[data-w="grenade"] { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cellipse cx='32' cy='19' rx='9' ry='11'/%3E%3Crect x='28' y='3' width='8' height='6'/%3E%3C/svg%3E"); }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="loading" class="overlay show">
+  <div class="logo">SOLANO<br>NIGHTS</div>
+  <div class="sub">Solano Beach · 1986</div>
+  <div id="loadBar"><div id="loadFill"></div></div>
+  <div id="loadText">Starting…</div>
+</div>
+
+<div id="title" class="overlay">
+  <div class="logo">SOLANO NIGHTS</div>
+  <div class="sub">Solano Beach · 1986</div>
+  <div class="menu">
+    <button class="btn" id="btnNew">New Game</button>
+    <button class="btn alt" id="btnContinue" style="display:none">Continue</button>
+    <div class="qrow">Graphics <select id="qualitySel"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
+    <div class="controls">
+      <div><b>WASD</b> move / drive</div><div><b>Mouse</b> look</div><div><b>Shift</b> sprint</div>
+      <div><b>Space</b> jump / handbrake</div><div><b>F</b> enter / exit car</div><div><b>E</b> interact / shop</div>
+      <div><b>RMB</b> aim</div><div><b>LMB</b> shoot / punch</div><div><b>R</b> reload</div>
+      <div><b>Wheel / 1-6 / Q</b> weapons</div><div><b>C</b> walk toggle</div><div><b>M</b> map</div>
+      <div><b>H</b> horn · <b>N</b> radio</div><div><b>G</b> siren (cop car)</div><div><b>Esc</b> pause</div>
+    </div>
+  </div>
+</div>
+
+<div id="pause" class="overlay">
+  <h1>PAUSED</h1>
+  <div id="pauseStats"></div>
+  <button class="btn" id="btnResume">Resume</button>
+  <button class="btn alt" id="btnSave">Save Game</button>
+  <div class="qrow">Graphics <select id="qualitySel2"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
+</div>
+
+<div id="hud" class="overlay">
+  <div id="damage"></div>
+  <div id="dmgDir"></div>
+  <div id="topRight">
+    <div id="clock">18:00</div>
+    <div id="weaponBox"><div><div id="weaponName">Fists</div><div id="ammo"></div></div><div id="weaponIcon" data-w="fist"></div></div>
+    <div id="bars"><div class="bar"><div id="hpFill" style="width:100%"></div></div><div class="bar" id="arBar"><div id="arFill" style="width:0"></div></div></div>
+    <div id="money">$0</div>
+    <div id="stars"></div>
+  </div>
+  <div id="minimapWrap"><canvas id="minimap" width="220" height="220"></canvas></div>
+  <div id="zone"></div>
+  <div id="notify"></div>
+  <div id="timer"></div>
+  <div id="objective"></div>
+  <div id="subtitle"></div>
+  <div id="hint"></div>
+  <div id="speedo"><div id="vehName"></div><div id="speedVal">0</div><div id="speedUnit">KM/H</div><div id="vhpBar"><div id="vhpFill"></div></div><div id="radio"></div></div>
+  <div id="crosshair"><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="hitmarker"></div>
+  <div id="bigText"><div id="bigMain"></div><div id="bigSub"></div></div>
+  <div id="bigmap"><canvas id="bigmapCanvas"></canvas><div id="bigmapLegend">● <span style="color:#ff3fa4">Mission</span> · <span style="color:#ffd23f">Objective</span> · <span style="color:#ff7a3c">G</span> Gun shop · <span style="color:#35f2ff">S</span> Spray Shack · <span style="color:#ff4d5a">+</span> Hospital · M to close</div></div>
+  <div id="shop"><h2>IRONCLAD ARMS</h2><div style="color:#aaa;margin-bottom:8px">Click or press 1–8 to buy · E / Esc to leave</div><div id="shopList"></div></div>
+</div>
+<div id="fade"></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
